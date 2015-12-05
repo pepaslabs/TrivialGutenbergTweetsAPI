@@ -21,12 +21,13 @@ errors = {
 
 resources = [
     ("/", ["GET"]),
+    ("/spec", ["GET"]),
     ("/tweets/{tweet_id}", ["GET"]),
     ("/tweets/pages/{pagenum}", ["GET"]),
-    ("/tweets/{tweet_id}/like", ["POST"]),
-    ("/users", ["GET"]),
-    ("/users/{user}/tweets", ["GET"]),
-    ("/users/{user}/tweets", ["POST"]),
+#    ("/tweets/{tweet_id}/like", ["POST"]),
+#    ("/users", ["GET"]),
+#    ("/users/{user}/tweets", ["GET"]),
+#    ("/users/{user}/tweets", ["POST"]),
 ]
 
 
@@ -61,8 +62,6 @@ def get_tweet(tweet_id):
     return d
 
 def db_tweet_as_dict(tweet):
-    # example output:
-    # { "schema":"tweet1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!", "timestamp":"2015-12-05 17:28:18" }
     (tweet_id, user, name, body, timestamp) = tweet
     return {"schema":"tweet1", "tweet_id":tweet_id, "user":user, "name":name, "body":body, "timestamp":timestamp}
 
@@ -83,7 +82,7 @@ def get_tweet_page(pagenum):
     tweets = db_query_tweets(index, count)
     if len(tweets) == 0:
         bottle.abort(404, errors[404002])
-    d = db_tweets_as_d(tweets)
+    d = db_tweets_as_dict(tweets)
     return d
 
 def pagenum_to_index_and_offset(pagenum):
@@ -93,8 +92,6 @@ def pagenum_to_index_and_offset(pagenum):
     return (index, offset)  
 
 def db_tweets_as_dict(tweets):
-    # example output:
-    # { "schema":"tweets1", "tweets": [ { "schema":"tweet1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!", "timestamp":"2015-12-05 17:28:18" } ] }
     return { "schema":"tweets1", "tweets": [ {"schema":"tweet1", "tweet_id":tweet_id, "user":user, "name":name, "body":body, "timestamp":timestamp} for (tweet_id, user, name, body, timestamp) in tweets] }
 
 def db_query_tweets(index, count):
