@@ -2,31 +2,41 @@
 
 # trivial "twitter"-like API.
 
-# API endpoints:
-
-# GET /
-# GET /tweets/pages/:pagenum
-# GET /tweets/:id
-# POST /tweets/:id/like
-# GET /users
-# GET /users/:id/tweets
-# POST /users/:id/tweets
-
-
-from bottle import route, run, response
+from __future__ import with_statement
+import bottle
 import sqlite3
+from json import dumps as json_dumps, loads as json_lds
+
+__author__ = 'Jason Pepas'
+__version__ = '0.0.1'
+__license__ = 'MIT'
+
 
 # functions
 
-@route('/')
+errors = {
+    404001: (404001, "No such tweet."),
+    404002: (404002, "No such page."),
+}
+
+@bottle.error(404)
+def error404(error):
+    bottle.response.content_type = 'application/json'
+    (code, message) = error.body
+    return json_dumps({"schema":"api_error1", "code":code, "message":message})
+
+@bottle.route('/')
 def get_index():
-    response.content_type = 'text/plain'
+    bottle.response.content_type = 'text/plain'
     with open('spec.yaml') as f:
         return f.read()
 
-@route('/tweets/<tweet_id>')
+
+@bottle.route('/tweets/<tweet_id>')
 def get_tweet(tweet_id):
-    tweet = db_query_tweet(tweet_id).fetchone()
+    tweet = db_query_tweet(tweet_id)
+    if tweet is None:
+        bottle.abort(404, errors[404001])
     json = db_tweet_as_json(tweet)
     return json
 
@@ -43,13 +53,16 @@ def db_query_tweet(tweet_id):
         join users on tweets.user_id = users.id
         where tweets.id = ?
         limit 1
-        """, (tweet_id,))
+        """, (tweet_id,)).fetchone()
 
-@route('/tweets/pages/<pagenum>')
+
+@bottle.route('/tweets/pages/<pagenum>')
 def get_tweet_page(pagenum):
     (index, offset) = pagenum_to_index_and_offset(pagenum)
     count = pagesize
     tweets = db_query_tweets(index, count)
+    if len(tweets) == 0:
+        bottle.abort(404, errors[404002])
     json = db_tweets_as_json(tweets)
     return json
 
@@ -61,8 +74,8 @@ def pagenum_to_index_and_offset(pagenum):
 
 def db_tweets_as_json(tweets):
     # example output:
-    # { "schema":"tweets:1", "tweets": [ { "schema":"tweet:1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!", "timestamp":"2015-12-05 17:28:18" } ] }
-    return { "schema":"tweets:1", "tweets": [ {"schema":"tweet:1", "tweet_id":tweet_id, "user":user, "name":name, "body":body, "timestamp":timestamp} for (tweet_id, user, name, body, timestamp) in tweets] }
+    # { "schema":"tweets1", "tweets": [ { "schema":"tweet1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!", "timestamp":"2015-12-05 17:28:18" } ] }
+    return { "schema":"tweets1", "tweets": [ {"schema":"tweet1", "tweet_id":tweet_id, "user":user, "name":name, "body":body, "timestamp":timestamp} for (tweet_id, user, name, body, timestamp) in tweets] }
 
 def db_query_tweets(index, count):
     return cur.execute("""
@@ -72,26 +85,11 @@ def db_query_tweets(index, count):
         order by tweets.id
         limit ?
         offset ?
-        """, (count, index))
+        """, (count, index)).fetchall()
 
-# globals
-
-base_url = "http://example.com"
-
-endpoints = {"resources":[
-    {"method":"GET", "url":"%s/" % base_url},
-    {"method":"GET", "url":"%s/tweets/:id" % base_url},
-    {"method":"GET", "url":"%s/tweets/pages/:pagenum" % base_url},
-    {"method":"POST", "url":"%s/tweets/:id/like" % base_url},
-    {"method":"GET", "url":"%s/users" % base_url},
-    {"method":"GET", "url":"%s/users/:id/tweets" % base_url},
-    {"method":"POST", "url":"%s/users/:id/tweets" % base_url},
-]}
-
-# main
 
 if __name__ == "__main__":
     conn = sqlite3.connect('db.sqlite3')
     cur = conn.cursor()
     pagesize = 50
-    run(host='localhost', port=8080, debug=True)
+    bottle.run(host='localhost', port=8080, debug=True)

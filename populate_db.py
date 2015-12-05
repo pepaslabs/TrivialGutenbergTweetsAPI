@@ -13,7 +13,7 @@ import codecs
 def shuffled_sentences(path):
     fp = codecs.open(path, encoding='utf8')
     data = fp.read()
-    sentences = [sentence.replace('\n',' ').replace('\r',' ') for sentence in tokenizer.tokenize(data)]
+    sentences = [sentence.replace('\n',' ').replace('\r',' ').replace('  ',' ') for sentence in tokenizer.tokenize(data)]
     random.shuffle(sentences)
     return sentences
 
