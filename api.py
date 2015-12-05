@@ -19,14 +19,34 @@ errors = {
     404002: (404002, "No such page."),
 }
 
+resources = [
+    ("/", ["GET"]),
+    ("/tweets/{tweet_id}", ["GET"]),
+    ("/tweets/pages/{pagenum}", ["GET"]),
+    ("/tweets/{tweet_id}/like", ["POST"]),
+    ("/users", ["GET"]),
+    ("/users/{user}/tweets", ["GET"]),
+    ("/users/{user}/tweets", ["POST"]),
+]
+
+
 @bottle.error(404)
 def error404(error):
     bottle.response.content_type = 'application/json'
     (code, message) = error.body
     return json_dumps({"schema":"api_error1", "code":code, "message":message})
 
+
 @bottle.route('/')
 def get_index():
+    return resources_as_dict()
+
+def resources_as_dict():
+    return {"schema":"resources1", "resources": [{"url":url, "methods": methods} for (url,methods) in resources]}
+
+
+@bottle.route('/spec')
+def get_spec():
     bottle.response.content_type = 'text/plain'
     with open('spec.yaml') as f:
         return f.read()
@@ -37,10 +57,10 @@ def get_tweet(tweet_id):
     tweet = db_query_tweet(tweet_id)
     if tweet is None:
         bottle.abort(404, errors[404001])
-    json = db_tweet_as_json(tweet)
-    return json
+    d = db_tweet_as_dict(tweet)
+    return d
 
-def db_tweet_as_json(tweet):
+def db_tweet_as_dict(tweet):
     # example output:
     # { "schema":"tweet1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!", "timestamp":"2015-12-05 17:28:18" }
     (tweet_id, user, name, body, timestamp) = tweet
@@ -63,8 +83,8 @@ def get_tweet_page(pagenum):
     tweets = db_query_tweets(index, count)
     if len(tweets) == 0:
         bottle.abort(404, errors[404002])
-    json = db_tweets_as_json(tweets)
-    return json
+    d = db_tweets_as_d(tweets)
+    return d
 
 def pagenum_to_index_and_offset(pagenum):
     pagenum = int(pagenum)
@@ -72,7 +92,7 @@ def pagenum_to_index_and_offset(pagenum):
     offset = index * pagesize
     return (index, offset)  
 
-def db_tweets_as_json(tweets):
+def db_tweets_as_dict(tweets):
     # example output:
     # { "schema":"tweets1", "tweets": [ { "schema":"tweet1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!", "timestamp":"2015-12-05 17:28:18" } ] }
     return { "schema":"tweets1", "tweets": [ {"schema":"tweet1", "tweet_id":tweet_id, "user":user, "name":name, "body":body, "timestamp":timestamp} for (tweet_id, user, name, body, timestamp) in tweets] }

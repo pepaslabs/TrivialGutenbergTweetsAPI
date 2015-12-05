@@ -3,6 +3,22 @@ info:
   version: 0.0.1
   title: 'tweets'
 paths:
+  /:
+    get:
+      description: |
+        Gets the resources available via this API.
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/resources1'
+  /spec:
+    get:
+      description: |
+        Gets the Swagger spec of this API.
+      responses:
+        '200':
+          description: Success
   /tweets/{tweet_id}:
     get:
       description: |
@@ -19,6 +35,10 @@ paths:
           description: Success
           schema:
             $ref: '#/definitions/tweet1'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api_error1'
   /tweets/pages/{pagenum}:
     get:
       description: |
@@ -29,13 +49,43 @@ paths:
           description: Page number (1-indexed)
           required: true
           type: number
-          format: long
+          format: uint64
       responses:
         '200':
           description: Successful response
           schema:
             $ref: '#/definitions/tweets1'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/api_error1'
 definitions:
+  resources1:
+    type: object
+    properties:
+      schema:
+        type: string
+      resources:
+        type: array
+        items:
+          type: object
+          properties:
+            url:
+              type: string
+            methods:
+              type: array
+              items:
+                type: string
+  api_error1:
+    type: object
+    properties:
+      schema:
+        type: string
+      code:
+        type: integer
+        format: uint32
+      message:
+        type: string
   tweet1:
     type: object
     properties:
