@@ -37,12 +37,12 @@ def pagenum_to_index_and_offset(pagenum):
 
 def db_tweets_as_json(tweets):
     # example output:
-    # { "schema":"tweets:1", "tweets": [ { "schema":"tweet:1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!" } ] }
-    return { "schema":"tweets:1", "tweets": [ {"schema":"tweet:1", "tweet_id":tweet_id, "user":user, "name":name, "body":body} for (tweet_id, user, name, body) in tweets] }
+    # { "schema":"tweets:1", "tweets": [ { "schema":"tweet:1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!", "timestamp":"2015-12-05 17:28:18" } ] }
+    return { "schema":"tweets:1", "tweets": [ {"schema":"tweet:1", "tweet_id":tweet_id, "user":user, "name":name, "body":body, "timestamp":timestamp} for (tweet_id, user, name, body, timestamp) in tweets] }
 
 def db_query_tweets(index, count):
     return cur.execute("""
-        select tweets.id, users.user, users.name, tweets.body
+        select tweets.id, users.user, users.name, tweets.body, tweets.timestamp
         from tweets
         join users on tweets.user_id = users.id
         limit ?
