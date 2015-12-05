@@ -4,6 +4,7 @@
 
 # API endpoints:
 
+# GET /
 # GET /tweets/pages/:pagenum
 # GET /tweets/:id
 # POST /tweets/:id/like
@@ -12,17 +13,40 @@
 # POST /users/:id/tweets
 
 
-from bottle import route, run
+from bottle import route, run, response
 import sqlite3
 
 # functions
 
 @route('/')
 def get_index():
-    return endpoints
+    response.content_type = 'text/plain'
+    with open('spec.yaml') as f:
+        return f.read()
+
+@route('/tweets/<tweet_id>')
+def get_tweet(tweet_id):
+    tweet = db_query_tweet(tweet_id).fetchone()
+    json = db_tweet_as_json(tweet)
+    return json
+
+def db_tweet_as_json(tweet):
+    # example output:
+    # { "schema":"tweet1", "tweet_id":1, "user":"mshelley", "name":"Mary Shelley", "body":"Hello, world!", "timestamp":"2015-12-05 17:28:18" }
+    (tweet_id, user, name, body, timestamp) = tweet
+    return {"schema":"tweet1", "tweet_id":tweet_id, "user":user, "name":name, "body":body, "timestamp":timestamp}
+
+def db_query_tweet(tweet_id):
+    return cur.execute("""
+        select tweets.id, users.user, users.name, tweets.body, tweets.timestamp
+        from tweets
+        join users on tweets.user_id = users.id
+        where tweets.id = ?
+        limit 1
+        """, (tweet_id,))
 
 @route('/tweets/pages/<pagenum>')
-def get_tweets_page(pagenum):
+def get_tweet_page(pagenum):
     (index, offset) = pagenum_to_index_and_offset(pagenum)
     count = pagesize
     tweets = db_query_tweets(index, count)
@@ -45,8 +69,10 @@ def db_query_tweets(index, count):
         select tweets.id, users.user, users.name, tweets.body, tweets.timestamp
         from tweets
         join users on tweets.user_id = users.id
+        order by tweets.id
         limit ?
-        offset ?""", (count, index))
+        offset ?
+        """, (count, index))
 
 # globals
 
@@ -54,8 +80,8 @@ base_url = "http://example.com"
 
 endpoints = {"resources":[
     {"method":"GET", "url":"%s/" % base_url},
-    {"method":"GET", "url":"%s/tweets/pages/:pagenum" % base_url},
     {"method":"GET", "url":"%s/tweets/:id" % base_url},
+    {"method":"GET", "url":"%s/tweets/pages/:pagenum" % base_url},
     {"method":"POST", "url":"%s/tweets/:id/like" % base_url},
     {"method":"GET", "url":"%s/users" % base_url},
     {"method":"GET", "url":"%s/users/:id/tweets" % base_url},
