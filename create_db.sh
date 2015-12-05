@@ -1,5 +1,5 @@
 #!/bin/bash
 
-set -eu -o pipefail
+set -e -o pipefail
 
 cat ddl.sql | sqlite3 db.sqlite3
