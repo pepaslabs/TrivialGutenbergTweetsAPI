@@ -1,6 +1,7 @@
 create table users
 (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user TEXT NOT NULL,
     name TEXT NOT NULL
 );
 

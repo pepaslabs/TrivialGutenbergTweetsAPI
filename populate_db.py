@@ -26,7 +26,7 @@ def shuffled_sentences(path):
 
 # "main"
 
-cur.execute('insert into users (id, name) values (?, ?)', (None, 'Mary Shelley'))
+cur.execute('insert into users (id, user, name) values (?, ?, ?)', (None, 'mshelley', 'Mary Shelley'))
 for s in shuffled_sentences('books/mary_shelley_frankenstein.txt'):
     cur.execute('insert into tweets (id, user_id, body) values (?, ?, ?)', (None, 1, s))
 
