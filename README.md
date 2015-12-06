@@ -31,3 +31,8 @@ This will present you with either a GUI or a terminal menu:
 * Run `api.py`
 * Point your web browser at [http://localhost:8080](http://localhost:8080)
 
+## Swagger Spec
+
+* [View in Swagger Editor](http://editor.swagger.io/#/?import=https://raw.githubusercontent.com/pepaslabs/TrivialGutenbergTweetsAPI/master/spec.yaml)
+
+
