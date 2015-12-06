@@ -29,7 +29,13 @@ This will present you with either a GUI or a terminal menu:
   * Download 10 books from [gutenberg.com](https://www.gutenberg.org)
   * Parse each book into sentences and insert them into the database as (about 50,000) "tweets".
 * Run `api.py`
-* Point your web browser at [http://localhost:8080](http://localhost:8080)
+* Point your web browser at [http://localhost:8080](http://localhost:8080) and try out some requests:
+  * [GET /](http://localhost:8080/)
+  * [GET /spec](http://localhost:8080/spec)
+  * [GET /tweets/127](http://localhost:8080/tweets/127)
+  * [GET /tweets/99999](http://localhost:8080/tweets/127) (this should 404)
+  * [GET /tweets/pages/9](http://localhost:8080/tweets/pages/9)
+  * [GET /tweets/pages/999](http://localhost:8080/tweets/pages/999) (this should 404)
 
 ## Swagger Spec
 
