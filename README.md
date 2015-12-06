@@ -11,7 +11,7 @@ sudo pip install nltk
 
 More specifically, it needs the `punkt` tokenizer models which are part of `nltk`.  Fire up a `python` REPL, `import nltk` and call `download()`:
 
-```bash
+```python
 $ python
 import nltk
 nltk.download()
