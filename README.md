@@ -29,5 +29,5 @@ This will present you with either a GUI or a terminal menu:
   * Download 10 books from [gutenberg.com](https://www.gutenberg.org)
   * Parse each book into sentences and insert them into the database as (about 50,000) "tweets".
 * Run `api.py`
-* Point your web browser at http://localhost:8080
+* Point your web browser at [http://localhost:8080](http://localhost:8080)
 
