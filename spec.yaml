@@ -48,7 +48,7 @@ paths:
           in: path
           description: Page number (1-indexed)
           required: true
-          type: number
+          type: integer
           format: uint64
       responses:
         '200':
