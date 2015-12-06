@@ -1,7 +1,7 @@
 swagger: '2.0'
 info:
   version: 0.0.1
-  title: 'tweets'
+  title: tweets
 paths:
   /:
     get:
@@ -19,7 +19,7 @@ paths:
       responses:
         '200':
           description: Success
-  /tweets/{tweet_id}:
+  '/tweets/{tweet_id}':
     get:
       description: |
         Gets a single tweet.
@@ -39,7 +39,7 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/api_error1'
-  /tweets/pages/{pagenum}:
+  '/tweets/pages/{pagenum}':
     get:
       description: |
         Gets a page of tweets.
@@ -60,34 +60,36 @@ paths:
           schema:
             $ref: '#/definitions/api_error1'
 definitions:
+  resource1:
+    type: object
+    required:
+      - url
+      - methods
+    properties:
+      url:
+        type: string
+      methods:
+        type: array
+        items:
+          type: string
   resources1:
     type: object
     required:
-    - schema
-    - resources
+      - schema
+      - resources
     properties:
       schema:
         type: string
       resources:
         type: array
         items:
-          type: object
-          required:
-          - url
-          - methods
-          properties:
-            url:
-              type: string
-            methods:
-              type: array
-              items:
-                type: string
+          $ref: '#/definitions/resource1'
   api_error1:
     type: object
     required:
-    - schema
-    - code
-    - message
+      - schema
+      - code
+      - message
     properties:
       schema:
         type: string
@@ -99,12 +101,12 @@ definitions:
   tweet1:
     type: object
     required:
-    - schema
-    - tweet_id
-    - user
-    - name
-    - body
-    - timestamp
+      - schema
+      - tweet_id
+      - user
+      - name
+      - body
+      - timestamp
     properties:
       schema:
         type: string
@@ -123,8 +125,8 @@ definitions:
   tweets1:
     type: object
     required:
-    - schema
-    - tweets
+      - schema
+      - tweets
     properties:
       schema:
         type: string
