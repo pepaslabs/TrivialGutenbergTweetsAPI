@@ -34,8 +34,11 @@ resources = [
 @bottle.error(404)
 def error404(error):
     bottle.response.content_type = 'application/json'
-    (code, message) = error.body
-    return json_dumps({"schema":"api_error1", "code":code, "message":message})
+    try:
+        (code, message) = error.body
+        return json_dumps({"schema":"api_error1", "code":code, "message":message})
+    except:
+        return error.body
 
 
 @bottle.route('/')
