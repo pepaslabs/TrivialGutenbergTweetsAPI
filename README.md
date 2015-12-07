@@ -1,5 +1,5 @@
 # TrivialGutenbergTweetsAPI
-A trivial twitter-like API, populated with data from Project Gutenberg.
+A trivial twitter-like API, populated with data from Project Gutenberg.  This is mostly an exercise in learning to write [Swagger](http://swagger.io/) specs.
 
 ## Dependencies
 
